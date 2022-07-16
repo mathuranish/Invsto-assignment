@@ -1,16 +1,15 @@
 import base64
 import datetime as dt
-from email.mime import base
 from io import BytesIO
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 
 from .models import TradeData
+
 
 # import any csv file
 def import_csv(request):
@@ -56,7 +55,7 @@ def import_csv(request):
 def importer(request):
     # set path of file
     df = pd.read_excel("strategy/myfile.xlsx")
-    print((df.datetime))
+    # print((df.datetime))
     format_data = "%Y-%m-%d %H:%M:%S"
     # converting data to objects
     for df in df.itertuples():
@@ -93,6 +92,9 @@ def return_graph():
     df["close"] = df["close"].astype(float)
     df["datetime"] = pd.to_datetime(df["datetime"])
     # print(df["close"])
+    df = df.set_index(df["datetime"])
+    df = df.drop("datetime", axis=1)
+
     df["50_sma"] = df["close"].rolling(window=50, min_periods=1).mean()
     df["20_sma"] = df["close"].rolling(window=20, min_periods=1).mean()
     df["Signal"] = 0.0
